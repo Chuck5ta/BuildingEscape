@@ -1,0 +1,15 @@
+#################
+# Derived files #
+#################
+Binaries/
+Build/
+Content/StarterContent/
+DerivedDataCache/
+Intermediate/
+Saved/
+*.VC.db
+*.VC.opendb
+
+
+# Don't ignore icon files in Build
+# !Build/**/*.ico
