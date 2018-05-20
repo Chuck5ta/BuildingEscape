@@ -21,24 +21,35 @@ void UOpenDoor::BeginPlay()
 	Super::BeginPlay();
 
 	// ...
+	
+}
+
+void UOpenDoor::OpenDoor()
+{
 	AActor* Owner = GetOwner();
 
-	FString ObjectName = Owner->GetName();
-	FString ObjectPos = Owner->GetActorRotation().ToString();
-	UE_LOG(LogTemp, Warning, TEXT("%s is at %s"), *ObjectName, *ObjectPos);
+//	FString ObjectName = Owner->GetName();
+//	FString ObjectPos = Owner->GetActorRotation().ToString();
+//	UE_LOG(LogTemp, Warning, TEXT("%s is at %s"), *ObjectName, *ObjectPos);
 
 	FRotator NewRotation = FRotator(0.0f, 60.0f, 0.0f);
 
 	Owner->SetActorRotation(NewRotation);
-	
 }
-
 
 // Called every frame
 void UOpenDoor::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	// ...
+	// Poll the Trigger Volume
+	if (PreasurePlate->IsOverlappingActor(AnActorThatOpens))
+	{
+		// If the ActorThatOpens is in the volume
+		OpenDoor();
+	}
 }
+
+
+
 
