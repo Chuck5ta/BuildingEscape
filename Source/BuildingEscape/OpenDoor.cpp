@@ -33,7 +33,7 @@ void UOpenDoor::OpenDoor()
 //	FString ObjectPos = Owner->GetActorRotation().ToString();
 //	UE_LOG(LogTemp, Warning, TEXT("%s is at %s"), *ObjectName, *ObjectPos);
 
-	FRotator NewRotation = FRotator(0.0f, 60.0f, 0.0f);
+	FRotator NewRotation = FRotator(0.0f, 90.0f, 0.0f);
 
 	Owner->SetActorRotation(NewRotation);
 }
