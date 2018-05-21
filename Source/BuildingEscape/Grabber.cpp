@@ -2,7 +2,9 @@
 
 #include "Grabber.h"
 #include "GameFramework/Actor.h"
+#include "Engine/World.h" // required for GetWord()
 
+#define OUT
 
 // Sets default values for this component's properties
 UGrabber::UGrabber()
@@ -21,7 +23,7 @@ void UGrabber::BeginPlay()
 	Super::BeginPlay();
 
 	// ...
-	UE_LOG(LogTemp, Warning, TEXT("Grabber reporting for duty!"));
+//	UE_LOG(LogTemp, Warning, TEXT("Grabber reporting for duty!"));
 	
 }
 
@@ -31,6 +33,22 @@ void UGrabber::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompone
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	// ...
+	// Get player viewpoint this tick
+	FVector PlayerViewPointLocation;
+	FRotator PlayerViewpointRotation;
+	GetWorld()->GetFirstPlayerController()->GetPlayerViewPoint(
+		PlayerViewPointLocation,
+		PlayerViewpointRotation
+	);
+	UE_LOG(LogTemp, Warning, TEXT("Viewport Location: %s"), *PlayerViewPointLocation.ToString());
+	UE_LOG(LogTemp, Warning, TEXT("Viewport rotation: %s"), *PlayerViewpointRotation.ToString())
+	UE_LOG(LogTemp, Warning, TEXT("========================"));
+
+	// Ray-cast out to reach distance
+
+	// See what we hit
+
+
+
 }
 

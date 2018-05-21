@@ -2,7 +2,7 @@
 
 #include "OpenDoor.h"
 //#include "GameFramework/Actor.h"
-#include "Engine/World.h"
+#include "Engine/World.h" // required for GetWord()
 
 
 // Sets default values for this component's properties
