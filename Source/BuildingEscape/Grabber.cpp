@@ -25,6 +25,17 @@ void UGrabber::BeginPlay()
 
 	// ...
 //	UE_LOG(LogTemp, Warning, TEXT("Grabber reporting for duty!"));
+
+    /// Look for attached Physics Handle
+	PhysicsHandle = GetOwner()->FindComponentByClass<UPhysicsHandleComponent>();
+	if (PhysicsHandle)
+	{
+		// PhysicsHandle is found
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("Physics handle is missing for: %s"), *GetOwner()->GetName())
+	}
 	
 }
 
@@ -61,7 +72,7 @@ void UGrabber::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompone
 		0.0f,
 		0.0f,
 		4.0f
-		);
+	);
 
 	/// Set up query parameters
 	FCollisionQueryParams TraceParameters(FName(TEXT("")), false, GetOwner());
@@ -79,7 +90,9 @@ void UGrabber::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompone
 	/// See what we hit
 	///Hit.Actor->GetName()
 	if (HaveHitSomething)
-          UE_LOG(LogTemp, Warning, TEXT("We've hit object: %s"), *Hit.Actor->GetName())
+	{
+		UE_LOG(LogTemp, Warning, TEXT("We've hit object: %s"), *Hit.Actor->GetName())
+	}
 
 }
 
