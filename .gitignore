@@ -1,14 +1,23 @@
 #################
 # Derived files #
 #################
+# Unreal generated
+##################
 Binaries/
 Build/
 Content/StarterContent/
 DerivedDataCache/
 Intermediate/
 Saved/
+
+# VS generated files
+####################
+*.suo
 *.VC.db
 *.VC.opendb
+# ALSO IGNORE
+# Content/StarterContent/Textures
+# Content/StarterContent/HDRO
 
 
 # Don't ignore icon files in Build
