@@ -1,9 +1,9 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
+#include "Grabber.h"
 #include "GameFramework/Actor.h"
 #include "Engine/World.h" // required for GetWord()
 #include "DrawDebugHelpers.h" // required for DrawDebugLine()
-#include "Grabber.h"
 
 #define OUT
 
@@ -12,7 +12,8 @@ UGrabber::UGrabber()
 {
 	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
 	// off to improve performance if you don't need them.
-	bWantsBeginPlay = true;
+	bWantsBeginPlay = true;	
+
 	PrimaryComponentTick.bCanEverTick = true;
 }
 
@@ -56,51 +57,21 @@ void UGrabber::SetupInputComponent()
 	}
 }
 
-void UGrabber::Grab()
-{
-	UE_LOG(LogTemp, Warning, TEXT("Grab pressed!"));
-
-	/// LINE TRACE and see if we reach any actors with physics body collision channel set (active)
-	GFirstPhysicsBodyInReach();
-
-	/// If we hit something, then attach a physics handle
-	// TODO attach physics handle
-}
-
-void UGrabber::Release()
-{
-	UE_LOG(LogTemp, Warning, TEXT("Released!"));
-	// TODO release physics handle
-}
-
 // Called every frame
 void UGrabber::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	// If the physics handle is attached
-	    // move the object that we're holding
-
-}
-
-const FHitResult UGrabber::GFirstPhysicsBodyInReach()
-{
 	// Get player viewpoint this tick
 	FVector PlayerViewpointLocation;
 	FRotator PlayerViewpointRotation;
 	GetWorld()->GetFirstPlayerController()->GetPlayerViewPoint(
-		PlayerViewpointLocation,
-		PlayerViewpointRotation
+		OUT PlayerViewpointLocation,
+		OUT PlayerViewpointRotation
 	);
-	//UE_LOG(LogTemp, Warning, TEXT("Viewport Location: %s"), *PlayerViewPointLocation.ToString());
-	//UE_LOG(LogTemp, Warning, TEXT("Viewport rotation: %s"), *PlayerViewpointRotation.ToString())
-	//UE_LOG(LogTemp, Warning, TEXT("========================"));
 
-	//	FVector LineTraceEnd = PlayerViewpointLocation + FVector(0.0f, 0.0f, 20.0f);
-
-	FVector LineTraceDirection = PlayerViewpointRotation.Vector();
 	/// Direction in which the toon is looking
-	FVector LineTraceEnd = PlayerViewpointLocation + LineTraceDirection * Reach;
+	FVector LineTraceEnd = PlayerViewpointLocation + PlayerViewpointRotation.Vector() * Reach;
 
 	/// Draw a red trace in the world to visualise
 	DrawDebugLine(
@@ -114,12 +85,70 @@ const FHitResult UGrabber::GFirstPhysicsBodyInReach()
 		4.0f
 	);
 
+	// If the physics handle is attached
+	if (PhysicsHandle && PhysicsHandle->GrabbedComponent)
+	{
+	//	UE_LOG(LogTemp, Warning, TEXT("Physics handle is attached"));
+	    // move the object that we're holding
+		PhysicsHandle->SetTargetLocation(LineTraceEnd);
+	} 
+
+}
+
+void UGrabber::Grab()
+{
+	UE_LOG(LogTemp, Warning, TEXT("Grab pressed!"));
+
+	/// LINE TRACE and see if we reach any actors with physics body collision channel set (active)
+	auto HitResult = GFirstPhysicsBodyInReach();
+	auto ComponentToGrab = HitResult.GetComponent();
+	auto ActorHit = HitResult.GetActor();
+
+	/// If we hit something, then attach a physics handle
+	// TODO attach physics handle
+	if (ActorHit)
+	{
+		// attach physics handle
+		UE_LOG(LogTemp, Warning, TEXT("ATTACH PHYSICS HANDLE"));
+		PhysicsHandle->GrabComponent(
+			ComponentToGrab,
+			NAME_None,
+			ComponentToGrab->GetOwner()->GetActorLocation(),
+			true // allow rotation
+		    );
+	}
+}
+
+void UGrabber::Release()
+{
+	UE_LOG(LogTemp, Warning, TEXT("Released!"));
+	PhysicsHandle->ReleaseComponent();
+}
+
+const FHitResult UGrabber::GFirstPhysicsBodyInReach()
+{
+	// Get player viewpoint this tick
+	FVector PlayerViewpointLocation;
+	FRotator PlayerViewpointRotation;
+	GetWorld()->GetFirstPlayerController()->GetPlayerViewPoint(
+		OUT PlayerViewpointLocation,
+		OUT PlayerViewpointRotation
+	);
+	//UE_LOG(LogTemp, Warning, TEXT("Viewport Location: %s"), *PlayerViewPointLocation.ToString());
+	//UE_LOG(LogTemp, Warning, TEXT("Viewport rotation: %s"), *PlayerViewpointRotation.ToString())
+	//UE_LOG(LogTemp, Warning, TEXT("========================"));
+
+	//	FVector LineTraceEnd = PlayerViewpointLocation + FVector(0.0f, 0.0f, 20.0f);
+
+	/// Direction in which the toon is looking
+	FVector LineTraceEnd = PlayerViewpointLocation + PlayerViewpointRotation.Vector() * Reach;
+
 	/// Set up query parameters
 	FCollisionQueryParams TraceParameters(FName(TEXT("")), false, GetOwner());
 
 	/// Line-trace (AKA Ray-cast) out to reach distance
 	FHitResult Hit;
-	bool HaveHitSomething = GetWorld()->LineTraceSingleByObjectType(
+	GetWorld()->LineTraceSingleByObjectType(
 		OUT Hit,
 		PlayerViewpointLocation,
 		LineTraceEnd,
@@ -128,12 +157,12 @@ const FHitResult UGrabber::GFirstPhysicsBodyInReach()
 	);
 
 	/// See what we hit
-	/// Hit.Actor->GetName()
-	if (HaveHitSomething)
+	AActor* ActorHit = Hit.GetActor();
+	if (ActorHit)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("We've hit object: %s"), *Hit.Actor->GetName())
 	}
 
-	return FHitResult();
+	return Hit;
 }
 
