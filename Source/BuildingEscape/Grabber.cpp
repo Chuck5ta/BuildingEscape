@@ -94,19 +94,25 @@ void UGrabber::Grab()
 	{
 		// attach physics handle
 		UE_LOG(LogTemp, Warning, TEXT("ATTACH PHYSICS HANDLE"));
-		PhysicsHandle->GrabComponent(
-			ComponentToGrab,
-			NAME_None, // no bones needed
-			ComponentToGrab->GetOwner()->GetActorLocation(),
-			true // allow rotation
-		    );
+		if (PhysicsHandle)
+		{
+			PhysicsHandle->GrabComponent(
+				ComponentToGrab,
+				NAME_None, // no bones needed
+				ComponentToGrab->GetOwner()->GetActorLocation(),
+				true // allow rotation
+			);
+		}
 	}
 }
 
 void UGrabber::Release()
 {
-	UE_LOG(LogTemp, Warning, TEXT("Released!"));
-	PhysicsHandle->ReleaseComponent();
+	if (PhysicsHandle)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Released!"));
+		PhysicsHandle->ReleaseComponent();
+	}
 }
 
 const FHitResult UGrabber::GFirstPhysicsBodyInReach()
